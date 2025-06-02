@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import FoodHeader from '../foodcomponents/FoodHeader';
-import { Image, View, Text, TextInput, TouchableOpacity, StyleSheet, Keyboard, TouchableWithoutFeedback } from 'react-native';
+import { ScrollView,Image, View, Text, TextInput, TouchableOpacity, StyleSheet, Keyboard, TouchableWithoutFeedback } from 'react-native';
+import Tags from '../foodcomponents/Tags'
+
+
 
 function LogFood() {
   const [selectedMeal, setSelectedMeal] = useState(null);
@@ -8,8 +11,16 @@ function LogFood() {
   const meals = ['Breakfast', 'Lunch', 'Dinner', 'Snack'];
   const feelings = ['Energized⚡️', 'Good 🙂', 'Tired 😴'];
 
+
+  const [tags, setTags] = useState([]);
+   const handleTagsChange = (newTags) => {
+    setTags(newTags);
+    // You can store this with meal data later
+  };
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <ScrollView>
       <View style={styles.container}>
         <FoodHeader />
 
@@ -51,6 +62,9 @@ function LogFood() {
           placeholder="Briefly describe what you ate..."
         />
 
+        {/*Tags */}
+        <Tags onChangeTags={handleTagsChange}/>
+
         {/* How did you feel */}
         <Text style={styles.label}>How did you feel?</Text>
         <View style={styles.feelingOptions}>
@@ -73,6 +87,7 @@ function LogFood() {
           <Text style={styles.submitText}>Submit</Text>
         </TouchableOpacity>
       </View>
+      </ScrollView>
     </TouchableWithoutFeedback>
   );
 };

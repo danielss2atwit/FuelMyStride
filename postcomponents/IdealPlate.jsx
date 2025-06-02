@@ -4,6 +4,7 @@ import { View, Image, Text, StyleSheet } from 'react-native';
 function IdealPlate() {
   return (
     <View style={styles.container}>
+      <Text style={styles.text}>Here is your recommended plate for your next meal:</Text>
       <Image
         source={require('../assets/ideal_plate.jpg')} // Update the path as needed
         style={styles.image}
@@ -18,7 +19,7 @@ function IdealPlate() {
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    marginBottom: 30,
+    marginBottom: 20,
   },
   image: {
     width: 250,
@@ -31,6 +32,15 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontStyle: 'italic',
     color: '#555',
+    backgroundColor:'#E1F4F9',
+    padding:10,
+    borderRadius:5,
+  },
+  text:{
+    fontSize:16,
+    marginTop:20,
+    textDecorationLine:'underline',
+
   },
 });
 
