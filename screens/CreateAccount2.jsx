@@ -1,10 +1,24 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground, KeyboardAvoidingView,Platform,ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 const CreateAccount2 = () => {
   const navigation = useNavigation();
-  const [diet, setDiet] = useState('');
+  
+  const [selectedDiets, setSelectedDiets] = useState([]);
+const [otherDiet, setOtherDiet] = useState('');
+const [showOtherInput, setShowOtherInput] = useState(false);
+
+const toggleDiet = (diet) => {
+  if (diet === 'Other') {
+    setShowOtherInput(!showOtherInput);
+    return;
+  }
+
+  setSelectedDiets((prev) =>
+    prev.includes(diet) ? prev.filter((d) => d !== diet) : [...prev, diet]
+  );
+};
 
    const [selectedGender, setSelectedGender] = useState(null);
   const [selectedActivity, setSelectedActivity] = useState(null);
@@ -17,7 +31,12 @@ const CreateAccount2 = () => {
   return (
     <ImageBackground source={require('../assets/track.jpg')} style={styles.background}
     blurRadius={5}>
-      <View style={styles.container}>
+      <KeyboardAvoidingView 
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={{flex:1}}
+      keyboardVerticalOffset={80}>
+        <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps='handled'>
+      
         
 
         <Text style={styles.label}>Gender</Text>
@@ -53,7 +72,31 @@ const CreateAccount2 = () => {
         </View>
 
         <Text style={styles.label}>Dietary Preferences</Text>
-        <TextInput style={styles.input} value={diet} onChangeText={setDiet} />
+<View style={styles.optionsRow}>
+  {['Vegan', 'Vegetarian', 'Pescatarian', 'Omnivore', 'Gluten-Free', 'Dairy-Free', 'Other'].map((diet) => (
+    <TouchableOpacity
+      key={diet}
+      style={[
+        styles.optionButton,
+        selectedDiets.includes(diet) || (diet === 'Other' && showOtherInput)
+          ? styles.selectedOptionButton
+          : null,
+      ]}
+      onPress={() => toggleDiet(diet)}
+    >
+      <Text style={styles.optionButtonText}>{diet}</Text>
+    </TouchableOpacity>
+  ))}
+</View>
+
+{showOtherInput && (
+  <TextInput
+    style={styles.input}
+    placeholder="Please specify..."
+    value={otherDiet}
+    onChangeText={setOtherDiet}
+  />
+)}
 
         <Text style={styles.label}>Training Goal</Text>
          <View style={styles.optionsRow}>
@@ -74,7 +117,8 @@ const CreateAccount2 = () => {
         <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('MainTabs')}>
           <Text style={styles.buttonText}>Submit</Text>
         </TouchableOpacity>
-      </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </ImageBackground>
   );
 };
@@ -83,7 +127,7 @@ export default CreateAccount2;
 
 const styles = StyleSheet.create({
  background: { flex: 1, justifyContent: 'center' },
-  container: { padding: 20 },
+  container: { padding: 20,paddingBottom:40, marginTop:50, },
   label: { fontWeight: 'bold', color: '#4B0082', marginTop: 15 },
   input: {
     backgroundColor: '#fff',

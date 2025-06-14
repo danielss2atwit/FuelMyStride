@@ -4,14 +4,18 @@ import { View, Image, Text, StyleSheet } from 'react-native';
 function IdealPlate() {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Here is your recommended plate for your next meal:</Text>
+      <View style={styles.calloutBox}>
+      <Text style={styles.text}>🍽️Here is your recommended plate for your next meal:</Text>
+      </View>
       <Image
         source={require('../assets/ideal_plate.jpg')} // Update the path as needed
         style={styles.image}
       />
+      <View style={styles.plateBanner}>
       <Text style={styles.caption}>
         🍽️ Ideal Plate: ⅓ Carbs | ⅓ Protein | ⅓ Color
       </Text>
+      </View>
     </View>
   );
 }
@@ -37,11 +41,23 @@ const styles = StyleSheet.create({
     borderRadius:5,
   },
   text:{
-    fontSize:16,
-    marginTop:20,
-    textDecorationLine:'underline',
+    fontSize:15,
+    fontWeight: '500',
+    color: '#0369A1',
+  
+    
+    
 
   },
+  calloutBox:{
+    backgroundColor: '#E0F2FE',
+    padding:10,
+    borderRadisu:8,
+    marginVertical:10,
+    alignSelf:'center',
+    margin:20,
+
+  }
 });
 
 export default IdealPlate;

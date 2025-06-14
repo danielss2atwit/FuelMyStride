@@ -1,6 +1,14 @@
 import {View,Text,TextInput,TouchableOpacity,StyleSheet} from 'react-native';
+import React, {useRef} from 'react';
 
-function Journal({navigation}){
+function Journal({navigation, scrollRef}){
+  const inputRef = useRef(null);
+
+  const handleFocus =()=>{
+    if (scrollRef?.current && inputRef?.current){
+      scrollRef.current.scrollToFocusedInput(inputRef.current);
+    }
+  };
   const handleSubmit =() =>{
     navigation.navigate('PostWorkout')
   }
@@ -9,10 +17,12 @@ function Journal({navigation}){
       <View style={styles.container}>
       <Text style={styles.label}>Journal</Text>
       <TextInput
+      ref={inputRef}
         style={styles.input}
         placeholder="Write about your workout..."
         multiline={true}
         textAlignVertical="top"
+        onFocus={handleFocus}
       />
       <TouchableOpacity style={styles.button} onPress={handleSubmit}>
         <Text style={styles.buttonText}>Submit</Text>

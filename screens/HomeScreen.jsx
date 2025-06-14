@@ -4,6 +4,7 @@ import TipOfDay from '../homecomponents/TipOfDay';
 import DailyView from '../homecomponents/DailyView';
 import GoalCalendar from '../homecomponents/GoalCalendar';
 import CountdownBox from '../homecomponents/CountdownBox'
+import GoalBox from '../homecomponents/GoalBox'
 
 
 function HomeScreen({ navigation }) {
@@ -17,6 +18,7 @@ function HomeScreen({ navigation }) {
       <GoalCalendar />
       <View style={styles.countdownContainer}>
       <CountdownBox />
+      <GoalBox />
       </View>
       </View>
       
@@ -40,7 +42,7 @@ const styles = StyleSheet.create({
 },
 countdownContainer:{
   justifyContent: 'center',
-  marginTop: 70, // tweak this value until visually centered
+  marginTop: 20, // tweak this value until visually centered
 },
 
 

@@ -1,16 +1,19 @@
-import React from 'react';
+import React, {useRef} from 'react';
 import { StyleSheet, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import HeaderWorkout from '../workoutcomponents/HeaderWorkout';
 import WorkoutInput from '../workoutcomponents/WorkoutInput';
 import WorkoutRanking from '../workoutcomponents/WorkoutRanking';
 import Journal from '../workoutcomponents/Journal';
+import { saveLog } from '../utils/storage';
 
 const LogWorkout = ({navigation}) => {
+  const scrollRef = useRef(null);
   
   return (
     <View style={styles.container}>
       <KeyboardAwareScrollView
+      ref={(ref) => (scrollRef.current = ref)}
         contentContainerStyle={styles.scrollContainer}
         enableOnAndroid
         extraScrollHeight={100}
@@ -19,7 +22,7 @@ const LogWorkout = ({navigation}) => {
         <HeaderWorkout />
         <WorkoutInput />
         <WorkoutRanking />
-        <Journal navigation={navigation}/>
+        <Journal navigation={navigation} scrollRef={scrollRef}/>
       </KeyboardAwareScrollView>
     </View>
   );
@@ -34,6 +37,6 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     flexGrow: 1,
-    paddingBottom:200,
+    paddingBottom:50,
   },
 });

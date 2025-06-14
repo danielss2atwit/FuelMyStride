@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
 
 const AVAILABLE_TAGS = [
-  'High Protein', 'Low Carb', 'High Carb', 'Veg Heavy', 'Light',
-  'Heavy', 'Balanced', 'Pre-Run', 'Post-Run', 'Post-Workout', 'Rest Day'
+  'High Protein', 'Low Carb', 'High Carb', 'Veg Packed', 'Light',
+  'Heavy', 'Balanced', 'Pre-Run', 'Post-Run', 'Post-Workout', 'Rest Day', 'Hydrating'
 ];
 
 const Tags = ({ onChangeTags }) => {

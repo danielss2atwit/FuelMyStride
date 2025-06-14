@@ -1,12 +1,37 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+
 
 const Settings = () => {
+  const navigation = useNavigation();
+
+  const routeMap = {
+  "Account Info": "AccountInfo",
+  "Update Preferences": "UpdatePreferences",
+  "Change Password": "ChangePassword",
+  "Add Race or Goal": "AddRaceGoal",
+  "Set Daily Reminders": "SetReminders",
+  "Notifications": "Notifications",
+  "Appearance": "Appearance",
+  "Data & Sync": "DataSync",
+  "FAQs": "FAQs",
+  "Contact Support": "Support",
+  "Privacy Policy": "PrivacyPolicy",
+};
+
+
   const Section = ({ title, options }) => (
     <View style={styles.sectionContainer}>
       <Text style={styles.sectionTitle}>{title}</Text>
       {options.map((opt, index) => (
-        <TouchableOpacity key={index} style={styles.button}>
+        <TouchableOpacity key={index} style={styles.button}
+        onPress={()=> {
+          const route = routeMap[opt];
+          if(route){
+            navigation.navigate(route);
+          }
+        }}>
           <Text style={styles.buttonText}>{opt}</Text>
         </TouchableOpacity>
       ))}

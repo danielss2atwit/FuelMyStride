@@ -10,7 +10,9 @@ function Insights(){
         <Text style={styles.insight}>
         “Performance tends to dip by 15% after low-carb days.”
         </Text>
-        <Text style={styles.more}>More Insights.....</Text>
+        <Text style={styles.more}>
+          “Energy levels rated higher on days with balanced meals (carbs + protein + veggies).”
+          </Text>
     </View>
 
       

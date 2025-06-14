@@ -17,7 +17,7 @@ const InsightsPastLogs = () => {
 const styles =StyleSheet.create({
   container:{
     flex:1,
-    backgroundColor:'#F6CFE1',
+    backgroundColor:'#FCF5D9',
   }
 })
 
