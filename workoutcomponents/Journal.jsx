@@ -1,7 +1,7 @@
-import {View,Text,TextInput,TouchableOpacity,StyleSheet} from 'react-native';
+import {View,Text,TextInput,StyleSheet} from 'react-native';
 import React, {useRef} from 'react';
 
-function Journal({navigation, scrollRef}){
+function Journal({scrollRef,value,onChangeText}){
   const inputRef = useRef(null);
 
   const handleFocus =()=>{
@@ -9,9 +9,7 @@ function Journal({navigation, scrollRef}){
       scrollRef.current.scrollToFocusedInput(inputRef.current);
     }
   };
-  const handleSubmit =() =>{
-    navigation.navigate('PostWorkout')
-  }
+  
 
     return(
       <View style={styles.container}>
@@ -23,10 +21,10 @@ function Journal({navigation, scrollRef}){
         multiline={true}
         textAlignVertical="top"
         onFocus={handleFocus}
+        value={value}
+        onChangeText={onChangeText}
       />
-      <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-        <Text style={styles.buttonText}>Submit</Text>
-      </TouchableOpacity>
+     
     </View>
     );
 
@@ -54,15 +52,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlignVertical: 'top',
   },
-  button: {
-    marginTop: 15,
-    backgroundColor: '#822f88',
-    padding: 10,
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: 'white',
-  },
+ 
 });
 
 export default Journal;

@@ -1,101 +1,98 @@
-import {ScrollView,Modal,View,Text,TextInput,StyleSheet,TouchableOpacity, TouchableWithoutFeedback} from 'react-native';
+import {
+  ScrollView,
+  Modal,
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  TouchableOpacity,
+  TouchableWithoutFeedback
+} from 'react-native';
 import React, { useState } from 'react';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { Picker } from '@react-native-picker/picker';
-import {FlatList} from 'react-native'
 
-function WorkoutInput(){
-
-    const [selectedTag, setSelectedTag] = useState(null);
+function WorkoutInput({ data, updateField }) {
   const tags = ['Easy', 'Moderate', 'Hard'];
   const [showTooltip, setShowTooltip] = useState(false);
-
   const [isTimePickerVisible, setTimePickerVisible] = useState(false);
-    const [time, setTime] = useState('');
-  
-    const showTimePicker = () => setTimePickerVisible(true);
-    const hideTimePicker = () => setTimePickerVisible(false);
-  
-    const handleConfirm = (selectedTime) => {
-      const formattedTime = selectedTime.toLocaleTimeString([], {
-        hour: '2-digit',
-        minute: '2-digit',
-      });
-      setTime(formattedTime);
-      hideTimePicker();
-    };
 
+  const [durationPicker, setDurationPicker] = useState({ type: null, visible: false });
+  const [pacePicker, setPacePicker] = useState({ type: null, visible: false });
+  const [distancePicker, setDistancePicker] = useState({ type: null, visible: false });
 
-const [durationHours, setDurationHours] = useState('0');
-const [durationMinutes, setDurationMinutes] = useState('0');
-const [durationSeconds, setDurationSeconds] = useState('0');
-const [durationPicker, setDurationPicker] = useState({ type: null, visible: false });
-const handleDurationSelect = (type, value) => {
-  if (type === 'hours') setDurationHours(value);
-  else if (type === 'minutes') setDurationMinutes(value);
-  else if (type === 'seconds') setDurationSeconds(value);
-  setDurationPicker({ type: null, visible: false });
-};
+  const showTimePicker = () => setTimePickerVisible(true);
+  const hideTimePicker = () => setTimePickerVisible(false);
 
+  const handleConfirm = (selectedTime) => {
+    const formattedTime = selectedTime.toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+    updateField('time', formattedTime ); // ✅ Corrected syntax
+    hideTimePicker();
+  };
 
-const [paceMinutes, setPaceMinutes] = useState('0');
-const [paceSeconds, setPaceSeconds] = useState('0');
-const [paceUnit, setPaceUnit] = useState('mi');
-const [pacePicker, setPacePicker] = useState({ type: null, visible: false });
-const handlePaceSelect = (type, value) => {
-  if (type === 'minutes') setPaceMinutes(value);
-  else if (type === 'seconds') setPaceSeconds(value);
-  else if (type === 'unit') setPaceUnit(value);
-  setPacePicker({ type: null, visible: false });
-};
+  const handleDurationSelect = (type, value) => {
+    updateField('duration', {
+      ...data.duration,
+      [type]: value,
+    });
+    setDurationPicker({ type: null, visible: false });
+  };
 
-const [distanceWhole, setDistanceWhole] = useState('0');
-const [distanceDecimal, setDistanceDecimal] = useState('0');
-const [distanceUnit, setDistanceUnit] = useState('mi');
-const [distancePicker, setDistancePicker] = useState({ type: null, visible: false });
-const handleDistanceSelect = (type, value) => {
-  if (type === 'whole') setDistanceWhole(value);
-  else if (type === 'decimal') setDistanceDecimal(value);
-  else if (type === 'unit') setDistanceUnit(value);
-  setDistancePicker({ type: null, visible: false });
-};
-  
+  const handlePaceSelect = (type, value) => {
+    updateField('pace', {
+      ...data.pace,
+      [type]: value,
+    });
+    setPacePicker({ type: null, visible: false });
+  };
 
-    return(
-         <View style={styles.container}>
-       <View style={styles.row}>
-              <Text style={styles.label}>Workout Intensity</Text>
-              <TouchableOpacity onPress={() => setShowTooltip(!showTooltip)}>
-            <Text style={styles.infoIcon}>ℹ️</Text>
-             </TouchableOpacity>
-            </View>
-      
-            {showTooltip && (
-            <TouchableWithoutFeedback onPress={() => setShowTooltip(false)}>
-              <View style={styles.tooltip}>
+  const handleDistanceSelect = (type, value) => {
+    updateField('distance', {
+      ...data.distance,
+      [type]: value,
+    });
+    setDistancePicker({ type: null, visible: false });
+  };
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.row}>
+        <Text style={styles.label}>Workout Intensity</Text>
+        <TouchableOpacity onPress={() => setShowTooltip(!showTooltip)}>
+          <Text style={styles.infoIcon}>ℹ️</Text>
+        </TouchableOpacity>
+      </View>
+
+      {showTooltip && (
+        <TouchableWithoutFeedback onPress={() => setShowTooltip(false)}>
+          <View style={styles.tooltip}>
             <Text style={styles.tooltipText}>
               Workout Intensity Guide:{'\n\n'}
-        •   Easy: Light effort, comfortable pace — you can chat while exercising. Good for recovery or warm-ups.{'\n\n'}
-        •    Moderate: Steady effort, noticeable increase in breathing and heart rate, but sustainable.{'\n\n'}
-        • Hard: High effort, challenging pace — you’re pushing yourself and can only speak in short phrases.
+              • Easy: Light effort, comfortable pace — you can chat while exercising. Good for recovery or warm-ups.{'\n\n'}
+              • Moderate: Steady effort, noticeable increase in breathing and heart rate, but sustainable.{'\n\n'}
+              • Hard: High effort, challenging pace — you’re pushing yourself and can only speak in short phrases.
             </Text>
           </View>
-        </TouchableWithoutFeedback>)}
+        </TouchableWithoutFeedback>
+      )}
 
       <View style={styles.tagRow}>
         {tags.map((tag, index) => (
           <TouchableOpacity
             key={index}
-            onPress={() => setSelectedTag(tag)}
+            onPress={() => updateField('selectedTag', tag)}
             style={[
               styles.tag,
-              selectedTag === tag && styles.selectedTag,
+              data.selectedTag === tag && styles.selectedTag,
             ]}
           >
             <Text
               style={[
                 styles.tagText,
-                selectedTag === tag && styles.selectedTagText,
+                data.selectedTag === tag && styles.selectedTagText,
               ]}
             >
               {tag}
@@ -104,152 +101,139 @@ const handleDistanceSelect = (type, value) => {
         ))}
       </View>
 
-      {/* Input Fields */}
       <View style={styles.inputRow}>
         <Text style={styles.inputLabel}>Start Time</Text>
-       <TouchableOpacity style={styles.inputBox} onPress={showTimePicker}>
-               <Text style={{ color: time ? '#000' : '#aaa' }}>
-                 {time || 'Select a time'}
-               </Text>
-                 </TouchableOpacity>
-                  <DateTimePickerModal
-               isVisible={isTimePickerVisible}
-               mode="time"
-               onConfirm={handleConfirm}
-               onCancel={hideTimePicker}
-                
-             />
+        <TouchableOpacity style={styles.inputBox} onPress={showTimePicker}>
+          <Text style={{ color: data.time ? '#000' : '#aaa' }}>
+            {data.time || 'Select a time'}
+          </Text>
+        </TouchableOpacity>
+        <DateTimePickerModal
+          isVisible={isTimePickerVisible}
+          mode="time"
+          onConfirm={handleConfirm}
+          onCancel={hideTimePicker}
+        />
       </View>
 
       <View style={styles.inputRow}>
-      <Text style={styles.inputLabel}>Duration</Text>
-  <View style={{ flexDirection: 'row', flex: 1, justifyContent: 'space-between' }}>
-    {['hours', 'minutes', 'seconds'].map((type) => {
-      const value =
-        type === 'hours'
-          ? durationHours
-          : type === 'minutes'
-          ? durationMinutes
-          : durationSeconds;
-      const label = type === 'hours' ? 'h' : type === 'minutes' ? 'm' : 's';
+        <Text style={styles.inputLabel}>Duration</Text>
+        <View style={{ flexDirection: 'row', flex: 1, justifyContent: 'space-between' }}>
+          {['hours', 'minutes', 'seconds'].map((type) => {
+            const val = data.duration[type] || '0';
+            const label = type === 'hours' ? 'h' : type === 'minutes' ? 'm' : 's';
 
-      return (
-        <TouchableOpacity
-          key={type}
-          style={styles.durationBox}
-          onPress={() => setDurationPicker({ type, visible: true })}
-        >
-          <Text style={{ color: '#000' }}>{`${value} ${label}`}</Text>
-        </TouchableOpacity>
-      );
-    })}
-  </View>
+            return (
+              <TouchableOpacity
+                key={type}
+                style={styles.durationBox}
+                onPress={() => setDurationPicker({ type, visible: true })}
+              >
+                <Text style={{ color: '#000' }}>{`${val} ${label}`}</Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
       </View>
+
+      <View style={styles.inputRow}>
+        <Text style={styles.inputLabel}>Distance</Text>
+        {['whole', 'decimal', 'unit'].map((type) => (
+          <TouchableOpacity key={type} style={styles.inputBox} onPress={() => setDistancePicker({ type, visible: true })}>
+            <Text>
+              {type === 'decimal' ? '.' : ''}
+              {data.distance[type] || (type === 'unit' ? 'mi' : '0')}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+
+      <View style={styles.inputRow}>
+        <Text style={styles.inputLabel}>Pace</Text>
+        {['minutes', 'seconds', 'unit'].map((type) => (
+          <TouchableOpacity key={type} style={styles.inputBox} onPress={() => setPacePicker({ type, visible: true })}>
+            <Text>
+              {data.pace[type] || '0'} {type === 'unit' ? '' : type}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+
+      {/* Shared Modal Logic for all pickers */}
       {durationPicker.visible && (
-  <View style={styles.modalOverlay}>
-    <ScrollView style={styles.modalContent}>
-      {[...Array(durationPicker.type === 'hours' ? 12 : 60).keys()].map((num) => (
-        <TouchableOpacity
-          key={num}
-          style={styles.modalItem}
-          onPress={() => handleDurationSelect(durationPicker.type, num.toString())}
-        >
-          <Text>{num}</Text>
-        </TouchableOpacity>
-      ))}
-      <TouchableOpacity onPress={() => setDurationPicker({ type: null, visible: false })}>
-        <Text style={{ textAlign: 'center', padding: 10, color: '#822f88' }}>Cancel</Text>
-      </TouchableOpacity>
-    </ScrollView>
-  </View>
-
-)}
-
-      
-       <View style={styles.inputRow}>
-  <Text style={styles.inputLabel}>Distance</Text>
-  <TouchableOpacity
-    style={styles.inputBox}
-    onPress={() => setDistancePicker({ type: 'whole', visible: true })}
-  >
-    <Text>{distanceWhole}</Text>
-  </TouchableOpacity>
-  <TouchableOpacity
-    style={styles.inputBox}
-    onPress={() => setDistancePicker({ type: 'decimal', visible: true })}
-  >
-    <Text>.{distanceDecimal}</Text>
-  </TouchableOpacity>
-  <TouchableOpacity
-    style={styles.inputBox}
-    onPress={() => setDistancePicker({ type: 'unit', visible: true })}
-  >
-    <Text>{distanceUnit}</Text>
-  </TouchableOpacity>
-      </View>
-    {distancePicker.visible && (
-  <View style={styles.modalOverlay}>
-    <ScrollView style={styles.modalContent}>
-      {distancePicker.type === 'unit'
-        ? ['mi', 'km'].map((unit) => (
-            <TouchableOpacity key={unit} style={styles.modalItem} onPress={() => handleDistanceSelect(distancePicker.type, unit)}>
-              <Text>{unit}</Text>
+        <TouchableWithoutFeedback onPress={() => setDurationPicker({type: null, visible:false})}>
+        <View style={styles.modalOverlay}>
+          <ScrollView style={styles.modalContent}>
+            {[...Array(durationPicker.type === 'hours' ? 12 : 60).keys()].map((num) => (
+              <TouchableOpacity
+                key={num}
+                style={styles.modalItem}
+                onPress={() => handleDurationSelect(durationPicker.type, num.toString())}
+              >
+                <Text>{num}</Text>
+              </TouchableOpacity>
+            ))}
+            <TouchableOpacity onPress={() => setDurationPicker({ type: null, visible: false })}>
+              <Text style={styles.cancelText}>Cancel</Text>
             </TouchableOpacity>
-          ))
-        : [...Array(distancePicker.type === 'whole' ? 100 : 10).keys()].map((num) => (
-            <TouchableOpacity key={num} style={styles.modalItem} onPress={() => handleDistanceSelect(distancePicker.type, num.toString())}>
-              <Text>{distancePicker.type === 'decimal' ? `.${num}` : num}</Text>
-            </TouchableOpacity>
-          ))}
-    </ScrollView>
-  </View>
-)}
+          </ScrollView>
+        </View>
+        </TouchableWithoutFeedback>
+      )}
 
-      <View style={styles.inputRow}>
-       <Text style={styles.inputLabel}>Pace</Text>
-  <TouchableOpacity
-    style={styles.inputBox}
-    onPress={() => setPacePicker({ type: 'minutes', visible: true })}
-  >
-    <Text>{paceMinutes} min</Text>
-  </TouchableOpacity>
-  <TouchableOpacity
-    style={styles.inputBox}
-    onPress={() => setPacePicker({ type: 'seconds', visible: true })}
-  >
-    <Text>{paceSeconds} sec</Text>
-  </TouchableOpacity>
-  <TouchableOpacity
-    style={styles.inputBox}
-    onPress={() => setPacePicker({ type: 'unit', visible: true })}
-  >
-    <Text>{paceUnit}</Text>
-  </TouchableOpacity>
-  </View>
-  {pacePicker.visible && (
-  <View style={styles.modalOverlay}>
-    <ScrollView style={styles.modalContent}>
-      {pacePicker.type === 'unit'
-        ? ['mi', 'km'].map((unit) => (
-            <TouchableOpacity key={unit} style={styles.modalItem} onPress={() => handlePaceSelect(pacePicker.type, unit)}>
-              <Text>{unit}</Text>
-            </TouchableOpacity>
-          ))
-        : [...Array(pacePicker.type === 'minutes' ? 30 : 60).keys()].map((num) => (
-            <TouchableOpacity key={num} style={styles.modalItem} onPress={() => handlePaceSelect(pacePicker.type, num.toString())}>
-              <Text>{num}</Text>
-            </TouchableOpacity>
-          ))}
-    </ScrollView>
-  </View>
-)}
-</View>
-  
+      {pacePicker.visible && (
+        <View style={styles.modalOverlay}>
+          <ScrollView style={styles.modalContent}>
+            {pacePicker.type === 'unit'
+              ? ['mi', 'km'].map((unit) => (
+                  <TouchableOpacity
+                    key={unit}
+                    style={styles.modalItem}
+                    onPress={() => handlePaceSelect(pacePicker.type, unit)}
+                  >
+                    <Text>{unit}</Text>
+                  </TouchableOpacity>
+                ))
+              : [...Array(pacePicker.type === 'minutes' ? 30 : 60).keys()].map((num) => (
+                  <TouchableOpacity
+                    key={num}
+                    style={styles.modalItem}
+                    onPress={() => handlePaceSelect(pacePicker.type, num.toString())}
+                  >
+                    <Text>{num}</Text>
+                  </TouchableOpacity>
+                ))}
+          </ScrollView>
+        </View>
+      )}
 
-    );
-
-
-
+      {distancePicker.visible && (
+        <View style={styles.modalOverlay}>
+          <ScrollView style={styles.modalContent}>
+            {distancePicker.type === 'unit'
+              ? ['mi', 'km'].map((unit) => (
+                  <TouchableOpacity
+                    key={unit}
+                    style={styles.modalItem}
+                    onPress={() => handleDistanceSelect(distancePicker.type, unit)}
+                  >
+                    <Text>{unit}</Text>
+                  </TouchableOpacity>
+                ))
+              : [...Array(distancePicker.type === 'whole' ? 100 : 10).keys()].map((num) => (
+                  <TouchableOpacity
+                    key={num}
+                    style={styles.modalItem}
+                    onPress={() => handleDistanceSelect(distancePicker.type, num.toString())}
+                  >
+                    <Text>{distancePicker.type === 'decimal' ? `.${num}` : num}</Text>
+                  </TouchableOpacity>
+                ))}
+          </ScrollView>
+        </View>
+      )}
+    </View>
+  );
 }
 const styles = StyleSheet.create({
  container: {

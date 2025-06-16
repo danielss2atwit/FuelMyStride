@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
 
 const AVAILABLE_TAGS = [
@@ -6,8 +6,15 @@ const AVAILABLE_TAGS = [
   'Heavy', 'Balanced', 'Pre-Run', 'Post-Run', 'Post-Workout', 'Rest Day', 'Hydrating'
 ];
 
-const Tags = ({ onChangeTags }) => {
+const Tags = ({onChangeTags,reset }) => {
   const [selectedTags, setSelectedTags] = useState([]);
+
+  useEffect(() => {
+    if (reset) {
+      setSelectedTags([]);
+      onChangeTags && onChangeTags([]); // notify parent of cleared tags
+    }
+  }, [reset]);
 
   const toggleTag = (tag) => {
     let newTags;

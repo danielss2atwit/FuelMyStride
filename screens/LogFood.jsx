@@ -4,11 +4,12 @@ import {Alert, ScrollView,Image, View, Text, TextInput, TouchableOpacity, StyleS
 import Tags from '../foodcomponents/Tags'
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { saveLog } from '../utils/storage';
-import { AsyncStorage } from '@react-native-async-storage/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 
-function LogFood() {
+function LogFood({navigation}) {
+  const [resetTags, setResetTags] = useState(false);
   const readLogs = async () => {
   try {
     const storedLogs = await AsyncStorage.getItem('foodLogs');
@@ -66,7 +67,7 @@ function LogFood() {
       return;
     }
 
-    const logEntry = {
+    const log = {
       type: 'food',
       mealType: selectedMeal,
       time,
@@ -77,15 +78,16 @@ function LogFood() {
     };
 
     try {
-      await saveLog(logEntry);
+      await saveLog(log);
       Alert.alert('Success', 'Your food log has been saved!');
-      
+      navigation.goBack();
       // Optional: Reset form after submit
       setSelectedMeal(null);
       setTime('');
       setSelectedFeeling(null);
       setTags([]);
       setDescription('');
+      setResetTags(prev => !prev);
     } catch (error) {
       Alert.alert('Error', 'There was an error saving your log.');
       console.error('SaveLog error:', error);
@@ -149,7 +151,7 @@ function LogFood() {
         />
 
         {/*Tags */}
-        <Tags onChangeTags={handleTagsChange}/>
+        <Tags reset={resetTags} onChangeTags={setTags}/>
 
         {/* How did you feel */}
         <View style={styles.row}>

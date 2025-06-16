@@ -1,9 +1,8 @@
 import {View,Text, StyleSheet,TouchableOpacity} from 'react-native';
 import { useState } from 'react';
 
-function WorkoutRanking(){
+function WorkoutRanking({selectedIndex,onSelect}){
 
-    const [selected, setSelected] = useState(null);
 
     const options = [
     { label: 'Full, had sufficient energy', icon: '🍽️' },
@@ -21,9 +20,9 @@ function WorkoutRanking(){
             key={index}
             style={[
               styles.box,
-              selected === index && styles.selectedBox, // highlight selected
+              selectedIndex === index && styles.selectedBox, // highlight selected
             ]}
-            onPress={() => setSelected(index)}
+            onPress={() => onSelect(index)}
           >
             <Text style={styles.icon}>{opt.icon}</Text>
             <Text style={styles.text}>{opt.label}</Text>
