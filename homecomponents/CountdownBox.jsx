@@ -3,7 +3,7 @@ import { View, Text, StyleSheet } from 'react-native';
 
 function CountdownBox() {
    const today = new Date();
-    const raceDate = new Date('2025-06-16'); // <-- Set your race day here
+    const raceDate = new Date('2025-08-25'); // <-- Set your race day here
 
     // Calculate difference in time
   const diffTime = raceDate.getTime() - today.getTime();

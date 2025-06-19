@@ -38,7 +38,7 @@ function GoalCalendar() {
           marked: true,
           dotColor: '#FF6B00',
         },
-        '2025-06-16': {
+        '2025-08-25': {
       customStyles: {
         container: {
           backgroundColor: 'yellow',

@@ -5,6 +5,12 @@ import {useFocusEffect} from '@react-navigation/native';
 import { ActivityIndicator } from 'react-native';
 
 
+const workoutFeelingOptions = [
+  { label: 'Full, had sufficient energy', icon: '🍽️' },
+  { label: 'Moderate, got harder towards the end', icon: '🍜' },
+  { label: 'Empty, low energy throughout', icon: '🥄' },
+];
+
 
 
 function PastLogs(){
@@ -189,9 +195,16 @@ const getMealTypeColor = (mealType) => {
                         : log?.pace || 'N/A'}
 
                         </Text>
-
-                        <Text style={styles.sectionHeader}>Feeling:</Text>
-                        <Text style={styles.modalText}>{log?.intensity || 'N/A'}</Text>
+                          
+                           <Text style={styles.sectionHeader}>Feeling:</Text>
+                        {(() => {
+                        const match = workoutFeelingOptions.find(opt => opt.label === log?.intensity);
+                        return (
+                       <Text style={styles.modalText}>
+                        {match ? `${match.icon} ${match.label}` : log?.intensity || 'N/A'}
+                        </Text>
+                          );
+                          })()}
 
 
                         <Text style={styles.sectionHeader}>Notes:</Text>

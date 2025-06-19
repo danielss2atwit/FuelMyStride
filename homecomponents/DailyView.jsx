@@ -1,21 +1,69 @@
-import React from 'react';
+import React , {useState, useCallback} from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { getLogs } from '../utils/storage';
+import { useFocusEffect } from '@react-navigation/native';
 
 
-const dummyLogs = [
-  { type: 'breakfast', label: 'breakfast', time: '07:30' },
-  { type: 'hard', label: 'workout', time: '09:00' },
-  { type: 'lunch', label: 'Lunch', time: '12:00' },
-  { type: 'snack', label: 'snack', time: '14:30' },
-  { type: 'dinner', label: 'dinner', time: '18:30' },
-  { type: 'snack', label: 'snack', time: '21:00' },
-];
 
-// Sort logs by time
-const sortedLogs = [...dummyLogs].sort((a, b) => a.time.localeCompare(b.time));
 
 
 function DailyView() {
+  const [logs, setLogs] = useState([]);
+
+  useFocusEffect(
+    useCallback(() => {
+      let isActive = true;
+      const fetchTodayLogs = async () => {
+        try{
+        const foodLogs = await getLogs('FOOD_LOGS');
+        const workoutLogs = await getLogs('WORKOUT_LOGS');
+
+        const today = new Date().toISOString().split('T')[0];
+        const allLogs = [...(foodLogs || []), ...(workoutLogs || [])];
+
+        const todayLogs = allLogs.filter((log) =>
+          log.timestamp?.startsWith(today)
+        );
+
+        const formatted = todayLogs.map((log) => {
+          if (log.type === 'workout') {
+            return {
+              type: log.intensity?.toLowerCase() || 'moderate',
+              label: 'workout',
+              time: log.time || '00:00',
+            };
+          } else {
+            return {
+              type: log.mealType?.toLowerCase() || 'snack',
+              label: log.mealType || 'food',
+              time: log.time || '00:00',
+            };
+          }
+        });
+
+      // Sort by time (HH:MM)
+          const sorted = formatted.sort((a, b) => {
+            const toMinutes = (t) => {
+              const [h, m] = t.split(':').map(Number);
+              return h * 60 + m;
+            };
+            return toMinutes(a.time) - toMinutes(b.time);
+          });
+
+          if (isActive) setLogs(sorted);
+        } catch (err) {
+          console.error('Error loading daily logs:', err);
+        }
+      };
+
+      fetchTodayLogs();
+
+      return () => {
+        isActive = false;
+      };
+    }, [])
+  );
+
   return (
     <View style={styles.wrapper}>
       <View style={styles.timeRow}>
@@ -25,11 +73,15 @@ function DailyView() {
       </View>
 
       <View style={styles.container}>
-        {sortedLogs.map((log, index) => (
-          <View key={index} style={[styles.block, getStyleByType(log.type)]}>
-            <Text style={styles.label}>{log.label}</Text>
-          </View>
-        ))}
+         {logs.length === 0 ? (
+          <Text style={{ fontSize: 12 }}>No logs yet</Text>
+        ) : (
+          logs.map((log, index) => (
+            <View key={index} style={[styles.block, getStyleByType(log.type)]}>
+              <Text style={styles.label}>{log.label}</Text>
+            </View>
+          ))
+        )}
       </View>
     </View>
   );

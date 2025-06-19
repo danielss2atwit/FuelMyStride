@@ -8,6 +8,13 @@ import Journal from '../workoutcomponents/Journal';
 import { saveLog } from '../utils/storage';
 
 const LogWorkout = ({navigation}) => {
+
+   const hungerOptions = [
+    { label: 'Full, had sufficient energy', icon: '🍽️' },
+    { label: 'Moderate, got harder towards the end', icon: '🍜' },
+    { label: 'Empty, low energy throughout', icon: '🥄' },
+  ];
+
   const scrollRef = useRef(null);
 
 const initialWorkoutData = {
@@ -40,7 +47,7 @@ const initialWorkoutData = {
       duration,
       distance,
       pace,
-      intensity: ranking || 'N/A',
+      intensity: hungerOptions[ranking]?.label || 'N/A',
       notes: journal || '',
       timestamp: new Date().toISOString(),
     };
