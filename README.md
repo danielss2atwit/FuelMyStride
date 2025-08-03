@@ -44,12 +44,10 @@
 
 ## 📸 Screenshots
 
-![Home screen](./assets/homepage.PNG)
-![Food Log](./assets/foodpage.PNG)
-![Food Log 2](./assets/foodpage2.PNG)
-![Workout](./assets/workoutspage.PNG)
-![Wellness](./assets/wellnesspage.PNG)
-![Insights](./assets/insightspage.PNG)
+<img src="./assets/homepage.PNG" alt="Home screen" width="300" /> <img src="./assets/foodpage.jpg" alt="Food Log" width="300" /> <img src="./assets/foodpage2.jpg" alt="Food Log 2" width="300" />
+ <img src="./assets/workoutspage.PNG" alt="Workouts Log" width="300" />
+<img src="./assets/wellnesspage.PNG" alt="Wellness Log" width="300" />
+<img src="./assets/insightspage.PNG" alt="Insights Page" width="300" />
 
 ---
 
@@ -63,10 +61,10 @@ Hi! I'm **Summer**, a runner and creator passionate about helping athletes avoid
 ## 💬 Feedback & Contact
 
 If you're testing the app or have ideas:
-- Fill out our [tester feedback form](https://forms.gle/8A32nNdqBwJXaMCE6)  
+- Fill out our [tester feedback form](https://forms.gle/cFHrt8csHXnWeZk77)  
 - Email: summer.fuelmystride@gmail.com  
 - Follow updates on Instagram @fuelmystride
 
 ---
 
-> _Thank you for helping bring this to life — every bit of feedback helps!_
+> _Thank you for helping bring this to life!Every bit of feedback helps!_
