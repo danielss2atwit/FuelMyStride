@@ -1,19 +1,45 @@
-import React from 'react';
+import React, {useState, useCallback} from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function CountdownBox() {
-   const today = new Date();
-    const raceDate = new Date('2025-08-25'); // <-- Set your race day here
+  const [daysLeft, setDaysLeft] = useState(null);
 
-    // Calculate difference in time
-  const diffTime = raceDate.getTime() - today.getTime();
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // Convert ms to days
+  useFocusEffect(
+    useCallback(() => {
+      const loadGoalDate = async () => {
+        try {
+          const jsonValue = await AsyncStorage.getItem('@user_goal');
+          if (jsonValue != null) {
+            const goal = JSON.parse(jsonValue);
+            const today = new Date();
+            const raceDate = new Date(goal.date);
+            const diffTime = raceDate.getTime() - today.getTime();
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            setDaysLeft(diffDays);
+          } else {
+            setDaysLeft(null);
+          }
+        } catch (e) {
+          console.log('Error loading goal date', e);
+        }
+      };
+      loadGoalDate();
+    }, [])
+  );
 
   return (
      <View style={styles.container}>
       <Text style={styles.title}>🏁 Race Day</Text>
-      <Text style={styles.countdown}>{diffDays}</Text>
-      <Text style={styles.label}>days to go</Text>
+      {daysLeft !== null ? (
+        <>
+          <Text style={styles.countdown}>{daysLeft}</Text>
+          <Text style={styles.label}>days to go</Text>
+        </>
+      ) : (
+        <Text style={styles.label}>No goal set</Text>
+      )}
     </View>
   );
 }

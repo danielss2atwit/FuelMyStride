@@ -3,6 +3,7 @@ import React, { useState, useEffect, useCallback} from 'react';
 import {getLogs,clearLogs} from '../utils/storage';
 import {useFocusEffect} from '@react-navigation/native';
 import { ActivityIndicator } from 'react-native';
+import { clearInsights } from '../InsightsService';
 
 
 const workoutFeelingOptions = [
@@ -60,11 +61,16 @@ function PastLogs(){
     setSelectedLog(null);
   };
 
-  const handleClearLogs = async () => {
-  await clearLogs('FOOD_LOGS');
-  await clearLogs('WORKOUT_LOGS') // assuming 'food' is your storage key
-  fetchLogs(); // update state so UI reflects deletion
+ const handleClearLogs = async () => {
+  
+    await clearLogs('FOOD_LOGS');
+    await clearLogs('WORKOUT_LOGS');
+    fetchLogs(); // update PastLogs state
+   
+  
 };
+
+
 
   const formatDate = (dateString) => {
     if (!dateString) return '';
@@ -144,6 +150,7 @@ const getMealTypeColor = (mealType) => {
         <Text style={{ textAlign: 'center', marginTop: 20 }}>No logs yet</Text>
       ) : (
         <FlatList
+        scrollEnabled={false}
     data={logs}
     keyExtractor={(item, index) => item.date + index} // use unique key here
     renderItem={({ item }) => (
@@ -258,6 +265,8 @@ const getMealTypeColor = (mealType) => {
       <TouchableOpacity onPress={handleClearLogs} style={styles.clearButton}>
         <Text style={{ color: 'white', textAlign: 'center' }}>Clear Logs (Test)</Text>
       </TouchableOpacity>
+
+      
     </View>
   );
 }

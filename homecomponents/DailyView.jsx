@@ -13,6 +13,7 @@ function DailyView() {
   useFocusEffect(
     useCallback(() => {
       let isActive = true;
+
       const fetchTodayLogs = async () => {
         try{
         const foodLogs = await getLogs('FOOD_LOGS');
@@ -26,43 +27,103 @@ function DailyView() {
         );
 
         const formatted = todayLogs.map((log) => {
-          if (log.type === 'workout') {
-            return {
-              type: log.intensity?.toLowerCase() || 'moderate',
-              label: 'workout',
-              time: log.time || '00:00',
+          const userTime = (log.time || '').trim();
+
+           return {
+              type: log.type === 'workout'
+                ? (log.intensity?.toLowerCase() || 'moderate')
+                : (log.mealType?.toLowerCase() || 'snack'),
+              label: log.type === 'workout' ? 'workout' : (log.mealType || 'food'),
+              time: userTime,
+              fallbackTime: log.timestamp, // for sorting fallback
             };
-          } else {
-            return {
-              type: log.mealType?.toLowerCase() || 'snack',
-              label: log.mealType || 'food',
-              time: log.time || '00:00',
-            };
-          }
+          
+           
         });
 
-      // Sort by time (HH:MM)
-          const sorted = formatted.sort((a, b) => {
-            const toMinutes = (t) => {
-              const [h, m] = t.split(':').map(Number);
-              return h * 60 + m;
-            };
-            return toMinutes(a.time) - toMinutes(b.time);
+
+
+       // Helper: convert time like "10:15 AM" to minutes
+          const toMinutes = (timeStr, fallbackISO) => {
+            if (timeStr && timeStr.includes(':')) {
+              try {
+
+                const cleanTime = timeStr.replace(/\s+/g, ' ').trim();
+                const parts = cleanTime.split(' ');
+
+                if (parts.length >= 2){
+                  const timePart = parts[0];
+                  const modifier = parts[1].toLowerCase();
+
+                  const [hoursStr, minutesStr] = timePart.split(':');
+                  let hours = parseInt(hoursStr, 10);
+                  let minutes = parseInt(minutesStr,10);
+                  if (isNaN(hours) || isNaN(minutes)){
+                    throw new Error('Invalid time format');
+                  }
+                  if (modifier === 'pm' && hours !== 12){
+                    hours += 12;
+                  }else if (modifier === 'am' && hours === 12){
+                    hours = 0;
+                  }
+                  return hours * 60 + minutes
+                }
+              }catch (error){
+                console.warn('Error parsing time:', timeStr,error);
+              }
+            }
+            if (fallbackISO){
+              const d = new Date(fallbackISO);
+              return d.getHours() * 60 + d.getMinutes();
+            }
+            return 0;
+          };
+
+          const withMinutes = formatted.map(log => ({
+            ...log,
+            minutes: toMinutes(log.time, log.fallbackTime)
+          }));
+
+          const sorted= [...withMinutes].sort((a,b) => {
+            console.log(`Comparing: ${a.label} (${a.time} = ${a.minutes}) vs ${b.label} (${b.time} = ${b.minutes})`);
+            return a.minutes - b.minutes;
           });
 
+    
+          console.log('📆 sorted logs:',sorted.map(log => ({
+            label: log.label,
+            time: log.time,
+            minutes:log.minutes
+          })));
+
+          const sortedTimes = sorted.map(log => `${log.label}: ${log.time} (${log.minutes})`);
+          console.log('⏰Final Order:',sortedTimes);
+
           if (isActive) setLogs(sorted);
-        } catch (err) {
-          console.error('Error loading daily logs:', err);
+        }catch (err) {
+          console.error('❌Error loading daily logs:', err);
         }
       };
-
       fetchTodayLogs();
-
       return () => {
         isActive = false;
       };
-    }, [])
+    },[])
   );
+
+  const getStyleByType = (type) => {
+  switch (type) {
+    case 'breakfast': return { backgroundColor: '#97E981' };
+    case 'lunch': return { backgroundColor: '#EDBDA4' };
+    case 'dinner': return { backgroundColor: '#D7A4ED' };
+    case 'snack': return { backgroundColor: '#F4C4DB' };
+    case 'easy': return { backgroundColor: '#C4F0F4' };
+    case 'moderate': return { backgroundColor: '#98B6D4' };
+    case 'hard': return { backgroundColor: '#7477B8' };
+    default: return { backgroundColor: '#ccc' };
+  }
+};
+
 
   return (
     <View style={styles.wrapper}>
@@ -78,7 +139,7 @@ function DailyView() {
         ) : (
           logs.map((log, index) => (
             <View key={index} style={[styles.block, getStyleByType(log.type)]}>
-              <Text style={styles.label}>{log.label}</Text>
+              <Text style={styles.label}>{log.label} @ {log.time}</Text>
             </View>
           ))
         )}
@@ -89,18 +150,6 @@ function DailyView() {
 
 export default DailyView
 
-const getStyleByType = (type) => {
-  switch (type) {
-    case 'breakfast': return { backgroundColor: '#97E981' };
-    case 'lunch': return { backgroundColor: '#EDBDA4' };
-    case 'dinner': return { backgroundColor: '#D7A4ED' };
-    case 'snack': return { backgroundColor: '#F4C4DB' };
-    case 'easy': return { backgroundColor: '#C4F0F4' };
-    case 'moderate': return { backgroundColor: '#98B6D4' };
-    case 'hard': return { backgroundColor: '#7477B8' };
-    default: return { backgroundColor: '#ccc' };
-  }
-};
 
 const styles = StyleSheet.create({
   wrapper: {

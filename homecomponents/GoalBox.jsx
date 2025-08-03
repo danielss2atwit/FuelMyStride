@@ -1,12 +1,41 @@
-import React from 'react';
+import React, {useCallback, useState} from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import { View, Text, StyleSheet } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 function GoalBox(){
+
+    const [goal, setGoal] = useState(null);
+
+    useFocusEffect( 
+    useCallback(() => {
+    const loadGoal = async () => {
+      try {
+        const jsonValue = await AsyncStorage.getItem('@user_goal');
+        if (jsonValue != null) {
+          setGoal(JSON.parse(jsonValue));
+        }
+      } catch (e) {
+        console.log('Failed to load goal.', e);
+      }
+    };
+    loadGoal();
+  }, [])
+);
+
+  if (!goal) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.title}>✅ Goal:</Text>
+        <Text style={styles.goal}>No goal set</Text>
+      </View>
+    );
+  }
 
     return(
         <View style={styles.container}>
             <Text style={styles.title}>✅Goal:</Text>
-            <Text style={styles.goal}>Fuel Well</Text>
+            <Text style={styles.goal}>{goal.distance}</Text>
 
         </View>
     );

@@ -1,24 +1,30 @@
 import React from 'react';
-import { View,StyleSheet} from 'react-native';
+import { View,StyleSheet, ScrollView} from 'react-native';
 import InsightsHeader from '../insightscomponents/InsightsHeader';
 import Insights from '../insightscomponents/Insights';
 import PastLogs from '../insightscomponents/PastLogs';
 
 const InsightsPastLogs = () => {
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={styles.container}>
+    
       <InsightsHeader />
       <Insights />
       <PastLogs />
-    </View>
+   
+    </ScrollView>
   );
 };
 
 const styles =StyleSheet.create({
   container:{
-    flex:1,
-    backgroundColor:'#FCF5D9',
-  }
+    flexGrow: 1,
+    backgroundColor: '#FCF5D9',
+    padding: 20,
+    paddingBottom: 50,
+    
+  },
+  
 })
 
 export default InsightsPastLogs;

@@ -18,10 +18,14 @@ import DataSync from './screens/settingsscreens/DataSync';
 import FAQs from './screens/settingsscreens/FAQs';
 import Support from './screens/settingsscreens/Support';
 import PrivacyPolicy from './screens/settingsscreens/PrivacyPolicy';
+import './TestAi.jsx'
+
 
 const Stack = createStackNavigator();
 
 export default function App() {
+  
+
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{headerShown:false}}
@@ -45,9 +49,10 @@ export default function App() {
         <Stack.Screen name="FAQs" component={FAQs} />
         <Stack.Screen name="Support" component={Support} />
         <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicy} />
-
       </Stack.Navigator>
     </NavigationContainer>
+
+    
   );
 }
 

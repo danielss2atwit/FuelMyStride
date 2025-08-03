@@ -35,3 +35,31 @@ export const clearLogs = async (key) => {
     console.error('Failed to clear logs:', error);
   }
 };
+
+// 🆕 Save or update a wellness log by date
+export const saveWellnessLog = async (entry) => {
+  try {
+    const key = 'wellnessLogs';
+    const existing = await AsyncStorage.getItem(key);
+    const logs = existing ? JSON.parse(existing) : [];
+
+    // Replace log if already exists for the same date
+    const updatedLogs = [...logs.filter(log => log.date !== entry.date), entry];
+
+    await AsyncStorage.setItem(key, JSON.stringify(updatedLogs));
+    console.log('Wellness log saved');
+  } catch (e) {
+    console.error('saveWellnessLog error:', e);
+  }
+};
+
+// 🆕 Get all wellness logs
+export const getWellnessLogs = async () => {
+  try {
+    const jsonValue = await AsyncStorage.getItem('wellnessLogs');
+    return jsonValue ? JSON.parse(jsonValue) : [];
+  } catch (e) {
+    console.error('getWellnessLogs error', e);
+    return [];
+  }
+};

@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import { View, Text, TextInput, StyleSheet,TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const AddRaceGoal = () => {
   const navigation = useNavigation();
@@ -9,6 +10,26 @@ const AddRaceGoal = () => {
   const [distance, setDistance] = useState('');
   const [date, setDate] = useState(new Date());
   const [showPicker, setShowPicker] = useState(false);
+
+  const saveGoal = async () => {
+  if (!name || !distance || !date) {
+    alert('Please fill all fields');
+    return;
+  }
+  try {
+    const goal = {
+      name,
+      distance,
+      date: date.toISOString(),
+    };
+    await AsyncStorage.setItem('@user_goal', JSON.stringify(goal));
+    alert('Goal saved!');
+    navigation.goBack();
+  } catch (e) {
+    alert('Failed to save goal.');
+  }
+};
+
   return(
   
   <View style={styles.container}>
@@ -27,7 +48,7 @@ const AddRaceGoal = () => {
     <Text style={styles.label}>Race/Goal Name</Text>
       <TextInput style={styles.input} value={name} onChangeText={setName} />
 
-      <Text style={styles.label}>Distance</Text>
+      <Text style={styles.label}>Time/Goal</Text>
       <TextInput style={styles.input} value={distance} onChangeText={setDistance} />
 
       <Text style={styles.label}>Target Date</Text>
@@ -41,7 +62,7 @@ const AddRaceGoal = () => {
         }} />
       )}
 
-      <TouchableOpacity style={styles.button}>
+      <TouchableOpacity style={styles.button} onPress={saveGoal}>
         <Text style={styles.buttonText}>Add Goal</Text>
       </TouchableOpacity>
 

@@ -1,4 +1,7 @@
-{
+import 'dotenv/config';
+
+
+export default {
   "expo": {
     "name": "FuelMyStride",
     "slug": "FuelMyStride",
@@ -24,6 +27,9 @@
     },
     "web": {
       "favicon": "./assets/background.png"
-    }
+    },
+    "extra":{
+      "openaiApiKey": process.env.OPENAI_KEY,
+    "claudeApiKey": process.env.CLAUDE_API_KEY    }
   }
 }
