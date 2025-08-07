@@ -2,6 +2,8 @@ import Constants from 'expo-constants';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getLogs, getWellnessLogs } from './utils/storage';
 import { calculateTrainingLoad, getPortionRangesFromPlate } from './utils/FuelUtils';
+import { CURRENT_PROMPT, PROMPT_VARIANTS } from './promptConfig';
+//prompt testing
 
 
 export const clearInsights = async () => {
