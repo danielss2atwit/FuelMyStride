@@ -4,8 +4,8 @@ import { getLogs, getWellnessLogs } from './utils/storage';
 import { calculateTrainingLoad, getPortionRangesFromPlate } from './utils/FuelUtils';
 import { PROMPT_VARIANTS } from './promptConfig';
 
-const OPENAI_API_KEY = Constants.expoConfig.extra.openai;
-const CLAUDE_API_KEY = Constants.expoConfig.extra.claude;
+const OPENAI_API_KEY = Constants.expoConfig.extra.openaiApiKey;
+const CLAUDE_API_KEY = Constants.expoConfig.extra.claudeApiKey;
 
 export const clearInsights = async () => {
   try {
@@ -15,14 +15,51 @@ export const clearInsights = async () => {
   }
 };
 
-export const generateNutritionInsights = async () => {
+
+export const getSavedInsights = async () => {
   try {
-    const [logs, wellnessLogs] = await Promise.all([getLogs(), getWellnessLogs()]);
-    const recentLogs = logs.slice(-7);
+    const json = await AsyncStorage.getItem('NUTRITION_INSIGHTS');
+    if (!json) return null;
+    return JSON.parse(json);
+  } catch (error) {
+    console.error('Error fetching saved insights:', error);
+    return null;
+  }
+};
+
+export const saveInsightsToStorage = async (insights) => {
+  try {
+    await AsyncStorage.setItem('NUTRITION_INSIGHTS', JSON.stringify(insights));
+  } catch (error) {
+    console.error('Error saving insights:', error);
+  }
+};
+
+export const shouldRefreshInsights = (lastGeneratedISO) => {
+  if (!lastGeneratedISO) return true;
+  const lastDate = new Date(lastGeneratedISO);
+  const now = new Date();
+  const diffDays = (now - lastDate) / (1000 * 60 * 60 * 24);
+  return diffDays > 3;  // refresh every 3 days
+};
+
+export const generateNutritionInsights = async () => {
+console.log('generateNutritionInsights started');
+  try {
+    let [foodLogs, workoutLogs, wellnessLogs] = await Promise.all([
+      getLogs('FOOD_LOGS'),
+      getLogs('WORKOUT_LOGS'),
+      getWellnessLogs()
+    ]);
+    // Ensure arrays, even if storage returns undefined/null
+    foodLogs = Array.isArray(foodLogs) ? foodLogs : [];
+    workoutLogs = Array.isArray(workoutLogs) ? workoutLogs : [];
+    wellnessLogs = Array.isArray(wellnessLogs) ? wellnessLogs : [];
+
+    const recentLogs = foodLogs.slice(-7);
     const recentWellness = wellnessLogs.slice(-7);
 
     const portionRanges = getPortionRangesFromPlate(recentLogs);
-    const trainingLoad = calculateTrainingLoad(logs);
 
     const wellnessFormatted = recentWellness.map(item => {
       return {
@@ -37,7 +74,7 @@ export const generateNutritionInsights = async () => {
     });
 
     const foodLogsFormatted = formatFoodLogs(recentLogs);
-    const workoutLogsFormatted = formatWorkoutLogs(logs);
+    const workoutLogsFormatted = formatWorkoutLogs(workoutLogs);
 
     const insights = {
       insights: [],
@@ -54,14 +91,18 @@ export const generateNutritionInsights = async () => {
 
       const start = Date.now();
       const aiResponse = await callOpenAIWithCustomPrompt(customPrompt);
+      console.log(`AI raw response for prompt ${key}:`, aiResponse);
       const duration = Date.now() - start;
       console.log(`Prompt ${key} took ${duration}ms`);
 
       const filteredResponse = await callClaudeForFilter(aiResponse);
+      console.log(`Filtered AI response for prompt ${key}:`, filteredResponse);
+
       const parsedInsights = parseInsights(filteredResponse);
+      console.log(`Parsed insights for prompt ${key}:`, parsedInsights);
 
       insights.insights.push({
-        promptVersion: key,
+         promptVersion: 'A',
         sections: parsedInsights
       });
     }
@@ -85,9 +126,10 @@ export const generateNutritionInsights = async () => {
       hasEnoughData: false
     };
   }
+
 };
 
-function formatFoodLogs(logs) {
+function formatFoodLogs(logs =[]) {
   return logs.map(log => ({
     date: log.date,
     mealType: log.mealType,
@@ -96,9 +138,9 @@ function formatFoodLogs(logs) {
   }));
 }
 
-function formatWorkoutLogs(logs) {
+function formatWorkoutLogs(logs = []) {
   return logs.flatMap(log => 
-    log.workouts.map(workout => ({
+    (log.workouts || []).map(workout => ({
       date: log.date,
       type: workout.type,
       intensity: workout.intensity,
@@ -125,6 +167,7 @@ async function callOpenAIWithCustomPrompt(prompt) {
   });
 
   const data = await response.json();
+  console.log('OpenAI API raw response:', data); // <-- Add this line
   return data?.choices?.[0]?.message?.content || '';
 }
 
@@ -154,12 +197,12 @@ async function callClaudeForFilter(text) {
 }
 
 function parseInsights(rawText) {
-  const sections = rawText.split(/###|\n\s*\d+\.\s+/).filter(Boolean);
-  return sections.map(section => {
-    const [titleLine, ...rest] = section.trim().split('\n');
+  if (!rawText) return [];
+  return rawText.split('\n\n').map(block => {
+    const lines = block.trim().split('\n');
     return {
-      title: titleLine.trim(),
-      content: rest.join('\n').trim()
+      title: lines[0] || '',
+      content: lines.slice(1).join('\n') || ''
     };
   });
 }
