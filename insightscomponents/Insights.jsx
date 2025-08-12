@@ -18,7 +18,7 @@ function Insights() {
     try {
     setLoading(true);
 
-    const TESTING_MODE = true; // Toggle this to false when done testing
+    const TESTING_MODE = false; // Toggle this to false when done testing
 
     const saved = await getSavedInsights();
 

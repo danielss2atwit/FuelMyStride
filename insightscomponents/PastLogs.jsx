@@ -61,14 +61,7 @@ function PastLogs(){
     setSelectedLog(null);
   };
 
- const handleClearLogs = async () => {
-  
-    await clearLogs('FOOD_LOGS');
-    await clearLogs('WORKOUT_LOGS');
-    fetchLogs(); // update PastLogs state
-   
-  
-};
+
 
 
 
@@ -262,9 +255,7 @@ const getMealTypeColor = (mealType) => {
         </View>
       </Modal>
 
-      <TouchableOpacity onPress={handleClearLogs} style={styles.clearButton}>
-        <Text style={{ color: 'white', textAlign: 'center' }}>Clear Logs (Test)</Text>
-      </TouchableOpacity>
+      
 
       
     </View>

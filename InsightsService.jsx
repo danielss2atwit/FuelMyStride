@@ -20,19 +20,19 @@ export const generateNutritionInsights = async () => {
     const wellnessLogs = await getWellnessLogs();
     
 
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    const fourteenDaysAgo = new Date();
+    fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14);
 
     const recentFoodLogs = foodLogs.filter(log =>
       new Date(log.timestamp) >= sevenDaysAgo
-    ).slice(-10);
+    ).slice(-20);
 
     const recentWorkoutLogs = workoutLogs.filter(log =>
       new Date(log.timestamp) >= sevenDaysAgo
-    ).slice(-5);
+    ).slice(-10);
 
     const recentWellnessLogs = wellnessLogs.filter(log =>
-  new Date(log.date) >= sevenDaysAgo
+  new Date(log.date) >= fourteenDaysAgo
 );
 
     console.log("Recent Food Logs:", recentFoodLogs);
