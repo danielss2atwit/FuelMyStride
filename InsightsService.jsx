@@ -15,6 +15,12 @@ export const clearInsights = async () => {
   }
 };
 
+function safeParseDate(log) {
+  if (log.date) return new Date(log.date);
+  if (log.timestamp) return new Date(log.timestamp);
+  return new Date(NaN); // invalid date
+}
+
 
 export const getSavedInsights = async () => {
   try {
@@ -43,6 +49,8 @@ export const shouldRefreshInsights = (lastGeneratedISO) => {
   return diffDays > 3;  // refresh every 3 days
 };
 
+
+
 export const generateNutritionInsights = async () => {
 console.log('generateNutritionInsights started');
   try {
@@ -56,8 +64,21 @@ console.log('generateNutritionInsights started');
     workoutLogs = Array.isArray(workoutLogs) ? workoutLogs : [];
     wellnessLogs = Array.isArray(wellnessLogs) ? wellnessLogs : [];
 
-    const recentLogs = foodLogs.slice(-7);
-    const recentWellness = wellnessLogs.slice(-7);
+function getLastNDaysLogs(logs, days = 7) {
+  const cutoff = new Date();
+  cutoff.setHours(0, 0, 0, 0);
+  cutoff.setDate(cutoff.getDate() - days);
+
+  return logs.filter(log => {
+    const logDate = safeParseDate(log);
+    return !isNaN(logDate) && logDate >= cutoff;
+  });
+}
+
+// In generateNutritionInsights:
+const recentLogs = getLastNDaysLogs(foodLogs, 7);
+const recentWorkoutLogs = getLastNDaysLogs(workoutLogs, 7);
+const recentWellness = getLastNDaysLogs(wellnessLogs, 7);
 
     const portionRanges = getPortionRangesFromPlate(recentLogs);
 
@@ -74,13 +95,14 @@ console.log('generateNutritionInsights started');
     });
 
     const foodLogsFormatted = formatFoodLogs(recentLogs);
-    const workoutLogsFormatted = formatWorkoutLogs(workoutLogs);
+    const workoutLogsFormatted = formatWorkoutLogs(recentWorkoutLogs);
 
     const insights = {
       insights: [],
       lastGenerated: new Date().toISOString(),
       hasEnoughData: foodLogsFormatted.length > 3
     };
+
 
     for (const key of Object.keys(PROMPT_VARIANTS)) {
       const customPrompt = PROMPT_VARIANTS[key]
@@ -91,15 +113,15 @@ console.log('generateNutritionInsights started');
 
       const start = Date.now();
       const aiResponse = await callOpenAIWithCustomPrompt(customPrompt);
-      console.log(`AI raw response for prompt ${key}:`, aiResponse);
+      
       const duration = Date.now() - start;
       console.log(`Prompt ${key} took ${duration}ms`);
 
       const filteredResponse = await callClaudeForFilter(aiResponse);
-      console.log(`Filtered AI response for prompt ${key}:`, filteredResponse);
+      
 
       const parsedInsights = parseInsights(filteredResponse);
-      console.log(`Parsed insights for prompt ${key}:`, parsedInsights);
+     
 
       insights.insights.push({
          promptVersion: 'A',
@@ -139,16 +161,29 @@ function formatFoodLogs(logs =[]) {
 }
 
 function formatWorkoutLogs(logs = []) {
-  return logs.flatMap(log => 
-    (log.workouts || []).map(workout => ({
-      date: log.date,
-      type: workout.type,
-      intensity: workout.intensity,
-      duration: workout.duration,
-      distance: workout.distance,
-      pace: workout.pace
-    }))
-  );
+  return logs.flatMap(log => {
+    if (Array.isArray(log.workouts)) {
+      // Multi-workout format
+      return log.workouts.map(workout => ({
+        date: log.date || log.timestamp,
+        type: workout.type,
+        intensity: workout.intensity,
+        duration: workout.duration,
+        distance: workout.distance,
+        pace: workout.pace
+      }));
+    } else {
+      // Single workout log format
+      return {
+        date: log.date || log.timestamp,
+        type: log.type || log.workoutType,
+        intensity: log.intensity,
+        duration: log.duration,
+        distance: log.distance,
+        pace: log.pace
+      };
+    }
+  });
 }
 
 async function callOpenAIWithCustomPrompt(prompt) {
@@ -193,11 +228,16 @@ async function callClaudeForFilter(text) {
   });
 
   const data = await response.json();
-  return data?.content?.[0]?.text || '';
+ const filtered = data?.content?.[0]?.text;
+  if (!filtered) {
+    console.warn('Claude filter returned no content:', data);
+    return '';
+  }
+  return filtered;
 }
 
 function parseInsights(rawText) {
-  if (!rawText) return [];
+ if (!rawText || typeof rawText !== 'string') return [];
   return rawText.split('\n\n').map(block => {
     const lines = block.trim().split('\n');
     return {
