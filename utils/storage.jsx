@@ -2,17 +2,24 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Save a log (food or workout) to the correct key based on type property
 export const saveLog = async (log) => {
-   try {
+  try {
     const key = log.type === 'food' ? 'FOOD_LOGS' : 'WORKOUT_LOGS';
     const existing = await AsyncStorage.getItem(key);
     const logs = existing ? JSON.parse(existing) : [];
 
-    logs.push({ ...log, timestamp: new Date().toISOString() });
+    const now = new Date();
+    const dateKey = now.toLocaleDateString('en-CA'); // YYYY-MM-DD local time
+
+    logs.push({
+      ...log,
+      timestamp: now.toISOString(), // keep full ISO for exact time
+      dateKey,                      // add local date key for filtering
+    });
+
     await AsyncStorage.setItem(key, JSON.stringify(logs));
-    console.log('saveLog success:');
+    console.log('✅ saveLog success');
   } catch (e) {
-    console.error('saveLog error:', e);
-    
+    console.error('❌ saveLog error:', e);
   }
 };
 
@@ -26,6 +33,7 @@ export const getLogs = async (key) => {
     return [];
   }
 };
+
 
 export const clearLogs = async (key) => {
   try {
@@ -63,3 +71,4 @@ export const getWellnessLogs = async () => {
     return [];
   }
 };
+

@@ -1,62 +1,31 @@
 export const PROMPT_VARIANTS = {
   A: `
-You are a sports nutrition expert analyzing a runner's logged meals and workouts over the past 7 days.
+You are a running and performance coach who specializes in nutrition and recovery.
 
-Generate a simplified, structured report with 3 clear sections:
+Analyze the runner’s meals, workouts, and wellness from the past week.
+Your job is to make it simple, motivating, and supportive.
 
-### 🏃‍♂️ 1. Performance & Fuel Timing
-- Show how specific meal timing/types impacted run pace or energy.
+Give feedback in two parts:
 
-### 🛌 2. Recovery & Wellness
-- Connect food to post-run hunger, soreness, or next-day energy.
+1) 3 Friendly Tips
+- Short, encouraging suggestions that connect food, recovery, and timing.
+- Always encourage fueling enough — never recommend restriction.
+- If a meal is less nutritious, suggest what to add next time (like protein, fiber, or hydration).
 
-### 📈 3. Trends & Suggestions
-- Point out weekly patterns and give 2–3 simple suggestions to improve.
+2) Next Week’s Checklist
+- ✅ Things they’re doing well (list at least 2–3 positives)
+- ⚠️ Things to adjust (list 2–3 specific improvements they can make)
 
-FUEL GOAL SUMMARY:
+FUEL GOAL:
 {{fuelGoal}}
 
-RECENT MEALS:
-{{foodLogs}}
-
-RECENT WORKOUTS:
-{{workoutLogs}}
-
-WELLNESS ENTRIES:
-{{wellnessLogs}}
-`,
-  B: `
-Pretend you are a running coach who specializes in nutrition. Analyze the runner's logs and generate 3 actionable suggestions that combine food, recovery, and timing. Keep it short and informal.
-
-FUEL GOAL SUMMARY:
-{{fuelGoal}}
-
-MEALS:
+FOOD:
 {{foodLogs}}
 
 WORKOUTS:
 {{workoutLogs}}
 
 WELLNESS:
-{{wellnessLogs}}
-`,
-  C: `
-You are a holistic health coach. Based on this runner’s data, write 3 sections:
-
-1. Summary of their fueling habits and timing
-2. Insights into their recovery, sleep, and soreness
-3. Tips to improve energy and recovery next week
-
-FUEL GOAL:
-{{fuelGoal}}
-
-FOOD LOGS:
-{{foodLogs}}
-
-WORKOUTS:
-{{workoutLogs}}
-
-WELLNESS NOTES:
 {{wellnessLogs}}
 `
 };
