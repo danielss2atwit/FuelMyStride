@@ -61,31 +61,32 @@ function PastLogs(){
     setSelectedLog(null);
   };
 
- const handleClearLogs = async () => {
-  
-    await clearLogs('FOOD_LOGS');
-    await clearLogs('WORKOUT_LOGS');
-    fetchLogs(); // update PastLogs state
-   
-  
-};
+
 
 
 
   const formatDate = (dateString) => {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    if (isNaN(date)) return '';
-    return date.toLocaleDateString(undefined, {month: 'short', day: 'numeric'});
+     if (!dateString) return '';
+  const date = new Date(dateString);
+
+  // If parsing failed (happens with YYYY-MM-DD strings in some browsers)
+  if (isNaN(date)) {
+    const [year, month, day] = dateString.split('-');
+    return new Date(year, month - 1, day).toLocaleDateString(undefined, {
+      month: 'short',
+      day: 'numeric',
+    });
+  }
+
+  return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
   };
 
   const groupLogsByDate = (logsArray) => {
-  const grouped = {};
+ const grouped = {};
 
   logsArray.forEach((log) => {
-    const dateObj = new Date(log.timestamp);
-    const dateKey = dateObj.toISOString().split('T')[0];
-  
+    // ✅ Prefer the stored local dateKey
+    const dateKey = log.dateKey || new Date(log.timestamp).toLocaleDateString('en-CA');
 
     if (!grouped[dateKey]) {
       grouped[dateKey] = {
@@ -97,7 +98,7 @@ function PastLogs(){
     grouped[dateKey].logs.push(log);
   });
 
-  // Convert object to array sorted by date descending
+  // Sort groups by date descending
   return Object.values(grouped).sort(
     (a, b) => new Date(b.date) - new Date(a.date)
   );
@@ -262,9 +263,7 @@ const getMealTypeColor = (mealType) => {
         </View>
       </Modal>
 
-      <TouchableOpacity onPress={handleClearLogs} style={styles.clearButton}>
-        <Text style={{ color: 'white', textAlign: 'center' }}>Clear Logs (Test)</Text>
-      </TouchableOpacity>
+      
 
       
     </View>

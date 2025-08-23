@@ -7,6 +7,9 @@ import CountdownBox from '../homecomponents/CountdownBox'
 import GoalBox from '../homecomponents/GoalBox'
 
 
+
+
+
 function HomeScreen({ navigation }) {
   return (
     <View style={styles.screen}>

@@ -12,7 +12,7 @@ const CreateAccount = () => {
    const [ageRange, setAgeRange] = useState('18-24');
 
   return (
-    <ImageBackground source={require('../assets/food-background.jpg')} style={styles.background}
+    <ImageBackground source={require('../assets/create-account.jpg')} style={styles.background}
     blurRadius={5}>
       <View style={styles.container}>
        

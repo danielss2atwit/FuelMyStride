@@ -13,7 +13,7 @@ const LoginPage = () => {
   };
 
   return (
-    <ImageBackground source={require('../assets/marathon.jpg')}
+    <ImageBackground source={require('../assets/log-in.jpg')}
     style={styles.background}
       blurRadius={5}>
     <View style={styles.container}>

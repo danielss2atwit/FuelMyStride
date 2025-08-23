@@ -1,5 +1,5 @@
-import React, { useState,useCallback } from 'react';
-import { useFocusEffect} from '@react-navigation/native';
+import React, { useState, useCallback } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import { View, StyleSheet, Text, ActivityIndicator, ScrollView } from 'react-native';
 import { generateNutritionInsights, getSavedInsights, shouldRefreshInsights, saveInsightsToStorage } from '../InsightsService.jsx'; // Adjust path as needed
 
@@ -9,44 +9,36 @@ function Insights() {
   const [hasEnoughData, setHasEnoughData] = useState(true);
 
   useFocusEffect(
-  useCallback(() => {
-    loadInsights(); // re-runs when screen is focused
-  }, [])
-);
+    useCallback(() => {
+      loadInsights();
+    }, [])
+  );
 
   const loadInsights = async () => {
     try {
-    setLoading(true);
+      setLoading(true);
 
-    const TESTING_MODE = true; // Toggle this to false when done testing
+      const TESTING_MODE = true; // Toggle this to false when done testing
 
-    const saved = await getSavedInsights();
+      const saved = await getSavedInsights();
 
-    if (!TESTING_MODE && saved && !shouldRefreshInsights(saved.lastGenerated)) {
-      // Use saved insights
-      setInsights(saved.insights);
-      setHasEnoughData(saved.hasEnoughData);
-    } else {
-      // Force regenerate insights
-      console.log('Generating new insights (forced refresh for testing)...');
-      const newInsights = await generateNutritionInsights();
-      setInsights(newInsights.insights);
-      setHasEnoughData(newInsights.hasEnoughData);
-
-      // Save the new insights
-      await saveInsightsToStorage(newInsights);
+      if (!TESTING_MODE && saved && !shouldRefreshInsights(saved.lastGenerated)) {
+        setInsights(saved.insights);
+        setHasEnoughData(saved.hasEnoughData);
+      } else {
+        console.log('Generating new insights (forced refresh for testing)...');
+        const newInsights = await generateNutritionInsights();
+        setInsights(newInsights.insights);
+        setHasEnoughData(newInsights.hasEnoughData);
+        await saveInsightsToStorage(newInsights);
+      }
+    } catch (error) {
+      console.error('Error loading insights:', error);
+      setInsights([]);
+      setHasEnoughData(false);
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    console.error('Error loading insights:', error);
-    setInsights([
-      "Keep logging your meals and workouts to get personalized insights!",
-      "Try to be consistent with your tracking for the best results.",
-      "Your nutrition insights will appear here as you build your data."
-    ]);
-    setHasEnoughData(false);
-  } finally {
-    setLoading(false);
-  }
   };
 
   if (loading) {
@@ -58,19 +50,54 @@ function Insights() {
     );
   }
 
-return (
+  return (
     <ScrollView contentContainerStyle={styles.scroll}>
-      {insights.map((insight, index) => {
-        const [title, ...bodyParts] = insight.split('\n\n');
-        const body = bodyParts.join('\n\n');
+      {insights.length === 0 && (
+        <Text style={styles.noDataText}>
+          💡 Keep logging meals and workouts to see personalized insights here!
+        </Text>
+      )}
 
-        return (
-          <View key={index} style={styles.card}>
-            <Text style={styles.cardTitle}>{title}</Text>
-            <Text style={styles.cardBody}>{body}</Text>
-          </View>
-        );
-      })}
+{insights.map((insight, i) => (
+  <View key={i} style={styles.insightBlock}>
+    {insight.sections.map((section, j) => {
+      // Clean up title
+      let cleanTitle = section.title
+        .replace(/\*\*/g, "")
+        .replace(/[#⭐]/g, "")
+        .trim();
+
+      // Clean up content (safer)
+      let cleanContent = section.content
+        // Remove Claude disclaimers
+        .replace(/^here.*removed\.*\s*/i, "")
+        // Only strip list markers at the start of a line (but keep the text after)
+        .replace(/^\s*(\d+[\.\)]|-)\s*/gm, "• ")
+        // Remove leftover markdown
+        .replace(/\*\*/g, "")
+        .replace(/[#⭐]/g, "")
+        .trim();
+
+      // Assign emoji
+      let emoji = "";
+      if (cleanTitle.toLowerCase().includes("performance")) emoji = "🏃‍♂️";
+      else if (cleanTitle.toLowerCase().includes("recovery")) emoji = "🛌";
+      else if (cleanTitle.toLowerCase().includes("trend") || cleanTitle.toLowerCase().includes("suggestion")) emoji = "📈";
+      else if (cleanTitle.toLowerCase().includes("tips")) emoji = "💡";
+      else if (cleanTitle.toLowerCase().includes("checklist")) emoji = "✅";
+      else if (cleanTitle.toLowerCase().includes("adjust")) emoji = "⚖️";
+
+      return (
+        <View key={j} style={styles.card}>
+          <Text style={styles.cardTitle}>
+            {emoji} <Text style={{ fontWeight: "bold" }}>{cleanTitle}</Text>
+          </Text>
+          <Text style={styles.cardBody}>{cleanContent}</Text>
+        </View>
+      );
+    })}
+  </View>
+))}
 
       {!hasEnoughData && (
         <Text style={styles.dataHint}>
@@ -86,6 +113,7 @@ return (
     </ScrollView>
   );
 }
+
 const styles = StyleSheet.create({
   container: {
     borderWidth: 1,

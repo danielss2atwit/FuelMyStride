@@ -1,6 +1,6 @@
-import React , {useState, useCallback} from 'react';
+import React , {useState, useEffect, useCallback} from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { getLogs } from '../utils/storage';
+import { getLogs, getLogsForDate } from '../utils/storage';
 import { useFocusEffect } from '@react-navigation/native';
 
 
@@ -19,12 +19,11 @@ function DailyView() {
         const foodLogs = await getLogs('FOOD_LOGS');
         const workoutLogs = await getLogs('WORKOUT_LOGS');
 
-        const today = new Date().toISOString().split('T')[0];
+        const today = new Date().toLocaleDateString('en-CA')
         const allLogs = [...(foodLogs || []), ...(workoutLogs || [])];
 
-        const todayLogs = allLogs.filter((log) =>
-          log.timestamp?.startsWith(today)
-        );
+        const todayLogs = allLogs.filter((log) => log.dateKey === today);
+      
 
         const formatted = todayLogs.map((log) => {
           const userTime = (log.time || '').trim();
@@ -139,7 +138,7 @@ function DailyView() {
         ) : (
           logs.map((log, index) => (
             <View key={index} style={[styles.block, getStyleByType(log.type)]}>
-              <Text style={styles.label}>{log.label} @ {log.time}</Text>
+              <Text style={styles.label}>{log.label} @ {log.time || 'unspecified'}</Text>
             </View>
           ))
         )}

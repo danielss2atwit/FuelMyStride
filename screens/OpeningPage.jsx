@@ -7,7 +7,7 @@ const OpeningPage = () => {
 
   return (
     <ImageBackground
-      source={require('../assets/opening-background.jpg')}
+      source={require('../assets/opening-background1.jpg')}
       style={styles.background}
       blurRadius={5}
     >
