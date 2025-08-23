@@ -58,19 +58,46 @@ function Insights() {
         </Text>
       )}
 
-      {insights.map((insight, i) => (
-        <View key={i} style={styles.insightBlock}>
-          <Text style={styles.insightVersionTitle}>
-            Insight Version: {insight.promptVersion}
+{insights.map((insight, i) => (
+  <View key={i} style={styles.insightBlock}>
+    {insight.sections.map((section, j) => {
+      // Clean up title
+      let cleanTitle = section.title
+        .replace(/\*\*/g, "")
+        .replace(/[#⭐]/g, "")
+        .trim();
+
+      // Clean up content (safer)
+      let cleanContent = section.content
+        // Remove Claude disclaimers
+        .replace(/^here.*removed\.*\s*/i, "")
+        // Only strip list markers at the start of a line (but keep the text after)
+        .replace(/^\s*(\d+[\.\)]|-)\s*/gm, "• ")
+        // Remove leftover markdown
+        .replace(/\*\*/g, "")
+        .replace(/[#⭐]/g, "")
+        .trim();
+
+      // Assign emoji
+      let emoji = "";
+      if (cleanTitle.toLowerCase().includes("performance")) emoji = "🏃‍♂️";
+      else if (cleanTitle.toLowerCase().includes("recovery")) emoji = "🛌";
+      else if (cleanTitle.toLowerCase().includes("trend") || cleanTitle.toLowerCase().includes("suggestion")) emoji = "📈";
+      else if (cleanTitle.toLowerCase().includes("tips")) emoji = "💡";
+      else if (cleanTitle.toLowerCase().includes("checklist")) emoji = "✅";
+      else if (cleanTitle.toLowerCase().includes("adjust")) emoji = "⚖️";
+
+      return (
+        <View key={j} style={styles.card}>
+          <Text style={styles.cardTitle}>
+            {emoji} <Text style={{ fontWeight: "bold" }}>{cleanTitle}</Text>
           </Text>
-          {insight.sections.map((section, j) => (
-            <View key={j} style={styles.card}>
-              <Text style={styles.cardTitle}>{section.title}</Text>
-              <Text style={styles.cardBody}>{section.content}</Text>
-            </View>
-          ))}
+          <Text style={styles.cardBody}>{cleanContent}</Text>
         </View>
-      ))}
+      );
+    })}
+  </View>
+))}
 
       {!hasEnoughData && (
         <Text style={styles.dataHint}>

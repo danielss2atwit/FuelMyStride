@@ -29,7 +29,7 @@ const toggleDiet = (diet) => {
   const goals = ['Shorter Race (<10k)', 'Longer Race (>10k)', 'General Fitness'];
 
   return (
-    <ImageBackground source={require('../assets/track.jpg')} style={styles.background}
+    <ImageBackground source={require('../assets/create-account2.jpg')} style={styles.background}
     blurRadius={5}>
       <KeyboardAvoidingView 
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -128,7 +128,7 @@ export default CreateAccount2;
 const styles = StyleSheet.create({
  background: { flex: 1, justifyContent: 'center' },
   container: { padding: 20,paddingBottom:40, marginTop:50, },
-  label: { fontWeight: 'bold', color: '#4B0082', marginTop: 15 },
+  label: { fontWeight: 'bold', color: '#4B0082', marginTop: 15,backgroundColor:'rgba(250, 249, 249, 0.8)', width:'30%',borderRadius:5, padding:5,marginBottom:10},
   input: {
     backgroundColor: '#fff',
     padding: 10,
